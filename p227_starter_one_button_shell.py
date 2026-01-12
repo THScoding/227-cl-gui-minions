@@ -5,7 +5,7 @@ from tkinter import filedialog
 from tkinter.filedialog import asksaveasfilename
 
 def do_command():
-    command = ["ping", "localhost"]
+    command = ["ping", "localhost", "-n", "4"]
     # Windows version to limit to 4 requests: command = ["ping", "localhost", "-n", "4"]
     # Mac version to limit to 4 requests:     command = ["ping", "localhost", "-n", "4"]
     
