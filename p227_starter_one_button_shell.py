@@ -25,7 +25,7 @@ for i in range(3):
             borderwidth=1
         )
         ping_btn = tk.Button(master=window, text="ping", command=do_command)
-        ping_btn.grid(row=0,column=0)
+        ping_btn.grid(row=0,column=0,sticky="n")
         
                 # creates the frame with label for the text box
         frame_URL = tk.Frame(window, pady=10,  bg="black") # change frame color
@@ -49,5 +49,8 @@ for i in range(3):
         # Adds an output box to GUI.
         command_textbox = tksc.ScrolledText(window, height=10, width=100)
         command_textbox.grid(row=2,column=0)
+        #url check button
+        ping_btn = tk.Button(window, text="Check to see if a URL is up and active", command=lambda:do_command("ping"))
+        ping_btn.grid(row=0,column=0,sticky="S")
 
 window.mainloop()
