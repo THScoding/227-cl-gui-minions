@@ -10,13 +10,21 @@ def do_command():
     # Mac version to limit to 4 requests:     command = ["ping", "localhost", "-n", "4"]
     
     subprocess.run(command)
+    # 1. Create the main application window
     
-root = tk.Tk()
-frame = tk.Frame(root)
-frame.pack()
+window = tk.Tk()
+window.title("ip config")
+for i in range(3):
+    window.columnconfigure(i, weight=1, minsize=75)
+    window.rowconfigure(i, weight=1, minsize=50)
 
-# set up button to run the do_command function
-ping_btn = tk.Button(frame, text="ping", command=do_command)
-ping_btn.pack()
+    for j in range(0, 3):
+        frame = tk.Frame(
+            master=window,
+            relief=tk.RAISED,
+            borderwidth=1
+        )
+        ping_btn = tk.Button(master=window, text="ping", command=do_command)
+        ping_btn.grid(row=0,column=0)
 
-root.mainloop()
+window.mainloop()
