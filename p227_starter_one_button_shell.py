@@ -38,14 +38,15 @@ def mSave():
   file.write(text_to_save)
   file.close()
     
-window = tk.Tk()
-window.title("ip config")
+root = tk.Tk()
+frame = tk.Frame(root)
+frame.pack()
 
-ping_btn = tk.Button(master=window, text="ping", command=do_command)
+ping_btn = tk.Button(root, text="ping", command=do_command)
 ping_btn.pack()
         
                 # creates the frame with label for the text box
-frame_URL = tk.Frame(window, pady=10,  bg="black") # change frame color
+frame_URL = tk.Frame(root, pady=10,  bg="black") # change frame color
 frame_URL.pack()
 
 # decorative label
@@ -58,10 +59,10 @@ url_label = tk.Label(frame_URL, text="Enter a URL of interest: ",
     fg="mediumpurple3",
     bg="black")
 url_label.pack()
-frame = tk.Frame(window,  bg="black") # change frame color
+frame = tk.Frame(root,  bg="black") # change frame color
 frame.pack(side=tk.LEFT)
 # Adds an output box to GUI.
-command_textbox = tksc.ScrolledText(window, height=10, width=100)
+command_textbox = tksc.ScrolledText(root, height=10, width=100)
 command_textbox.pack()
 #url check button
 # CODE TO ADD
@@ -76,4 +77,4 @@ ping_btn = tk.Button(frame, text="Check to see if a URL is up and active",
     bg="white", activebackground="gray")
 ping_btn.pack(side=tk.RIGHT) 
 
-window.mainloop()
+root.mainloop()
