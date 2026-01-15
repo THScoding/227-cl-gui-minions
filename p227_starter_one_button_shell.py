@@ -3,9 +3,9 @@ import tkinter as tk
 import tkinter.scrolledtext as tksc
 from tkinter import filedialog
 from tkinter.filedialog import asksaveasfilename    
-
 def do_command():
     subprocess.call("ping localhost")
+    
 def do_command(command):
     global command_textbox, url_entry
     
