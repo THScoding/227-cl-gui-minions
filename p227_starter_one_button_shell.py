@@ -1,8 +1,10 @@
 import subprocess
+import threading
 import tkinter as tk
 import tkinter.scrolledtext as tksc
 from tkinter import filedialog
-from tkinter.filedialog import asksaveasfilename    
+from tkinter.filedialog import asksaveasfilename   
+    
 def do_command():
     subprocess.call("ping localhost")
     
@@ -21,14 +23,6 @@ def do_command(command):
             command_textbox.insert(tk.END,line)
             command_textbox.update()
 
-def mSave():
-    filename = asksaveasfilename(defaultextension='.txt',filetypes = (('Text files', '*.txt'),('Python files', '*.py *.pyw'),('All files', '*.*')))
-    if filename is None:
-        return
-    file = open (filename, mode = 'w')
-    text_to_save = command_textbox.get("1.0", tk.END)
-    file.write(text_to_save)
-    file.close()
 
 root = tk.Tk()
 frame = tk.Frame(root)
@@ -49,8 +43,6 @@ ping_btn = tk.Button(frame, text="Check to see if a URL is up and active",
     bg="white", activebackground="gray")
 ping_btn.pack() 
 #save button
-ping_btn = tk.Button(frame, text="Save output", command=mSave)
-ping_btn.pack()
 
 # creates the frame with label for the text box
 frame_URL = tk.Frame(root, pady=10,  bg="black") # change frame color
@@ -75,4 +67,72 @@ frame.pack()
 command_textbox = tksc.ScrolledText(frame, height=10, width=100)
 command_textbox.pack()
 
+def run_netstat(output_widget):
+    command = ['netstat', '-an'] 
+    
+    # Clear previous output
+    output_widget.config(state=tk.NORMAL)
+    output_widget.delete('1.0', tk.END)
+    output_widget.insert(tk.END, "Running netstat -an...\\n")
+    output_widget.config(state=tk.DISABLED)
+
+    def execute_command():
+        try:
+            # Use subprocess.Popen to capture output
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
+            
+            # Read and display output line by line
+            for line in iter(process.stdout.readline, ''):
+                output_widget.config(state=tk.NORMAL)
+                output_widget.insert(tk.END, line)
+                output_widget.see(tk.END) # Auto-scroll to the bottom
+                output_widget.config(state=tk.DISABLED)
+            
+            process.stdout.close()
+            process.wait()
+            
+            output_widget.config(state=tk.NORMAL)
+            output_widget.insert(tk.END, "\\nCommand finished.\\n")
+            output_widget.config(state=tk.DISABLED)
+
+        except FileNotFoundError:
+            output_widget.config(state=tk.NORMAL)
+            output_widget.insert(tk.END, f"Error: '{command[0]}' command not found. Make sure it is in your system's PATH.\\n")
+            output_widget.config(state=tk.DISABLED)
+        except Exception as e:
+            output_widget.config(state=tk.NORMAL)
+            output_widget.insert(tk.END, f"An error occurred: {e}\\n")
+            output_widget.config(state=tk.DISABLED)
+
+    # Start the command execution in a new thread
+    thread = threading.Thread(target=execute_command)
+    thread.start()
+
+
+# Create a Text widget for output with a scrollbar
+scrollbar = tk.Scrollbar(frame)
+output_text = tk.Text(frame, wrap=tk.WORD, yscrollcommand=scrollbar.set, state=tk.DISABLED)
+scrollbar.config(command=output_text.yview)
+
+# Pack the widgets
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+# Create a button to run the netstat command
+run_button = tk.Button(root, text="Run netstat -an", command=lambda: run_netstat(output_text))
+run_button.pack(pady=10)
+
+def mSave():
+    filename = asksaveasfilename(defaultextension='.txt',filetypes = (('Text files', '*.txt'),('Python files', '*.py *.pyw'),('All files', '*.*')))
+    if filename is None:
+        return
+    file = open (filename, mode = 'w')
+    text_to_save = command_textbox.get("1.0", tk.END)
+    text_to_save + output_text.get("1.0", tk.END)
+    file.write(text_to_save)
+    file.close()
+    
+ping_btn = tk.Button(frame, text="Save output", command=mSave)
+ping_btn.pack()
+    
 root.mainloop()
