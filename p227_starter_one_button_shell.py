@@ -67,10 +67,25 @@ frame.pack()
 command_textbox = tksc.ScrolledText(frame, height=10, width=100)
 command_textbox.pack()
 
+# Create a Text widget for output with a scrollbar
+scrollbar = tk.Scrollbar(frame)
+output_text = tksc.ScrolledText(frame, wrap=tk.WORD, yscrollcommand=scrollbar.set, state=tk.DISABLED)
+scrollbar.config(command=output_text.yview)
+
+# Pack the widgets
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+
+# Create a button to run the netstat command
+run_button = tk.Button(root, text="Run netstat -an", command=lambda: run_netstat(output_text))
+run_button.pack(pady=10)
+
+
 def run_netstat(output_widget):
     command = ['netstat', '-an'] 
     
-    # Clear previous output
+    # Clear previous output 
     output_widget.config(state=tk.NORMAL)
     output_widget.delete('1.0', tk.END)
     output_widget.insert(tk.END, "Running netstat -an...\\n")
@@ -108,27 +123,13 @@ def run_netstat(output_widget):
     thread = threading.Thread(target=execute_command)
     thread.start()
 
-
-# Create a Text widget for output with a scrollbar
-scrollbar = tk.Scrollbar(frame)
-output_text = tk.Text(frame, wrap=tk.WORD, yscrollcommand=scrollbar.set, state=tk.DISABLED)
-scrollbar.config(command=output_text.yview)
-
-# Pack the widgets
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-# Create a button to run the netstat command
-run_button = tk.Button(root, text="Run netstat -an", command=lambda: run_netstat(output_text))
-run_button.pack(pady=10)
-
 def mSave():
     filename = asksaveasfilename(defaultextension='.txt',filetypes = (('Text files', '*.txt'),('Python files', '*.py *.pyw'),('All files', '*.*')))
     if filename is None:
         return
+    text_to_save = ""
     file = open (filename, mode = 'w')
-    text_to_save = command_textbox.get("1.0", tk.END)
-    text_to_save + output_text.get("1.0", tk.END)
+    text_to_save = output_text.get("1.0", tk.END) + "/n" + command_textbox.get("1.0", tk.END)
     file.write(text_to_save)
     file.close()
     
